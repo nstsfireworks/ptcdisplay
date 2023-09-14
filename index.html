@@ -1,0 +1,138 @@
+<html><head>
+    <title>Ticket Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #statusDisplay {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Ticket Manager</h1>
+
+    <label for="ticketNumber">Enter Ticket Number:</label>
+    <input type="text" id="ticketNumber">
+
+    <label for="ticketHolder">Ticket Holder Name:</label>
+    <input type="text" id="ticketHolder">
+
+    <button onclick="registerTicket()">Register Ticket</button>
+    <button onclick="checkStatus()">Check Status</button>
+    <button onclick="updateStatus('Paid')">Mark as Paid</button>
+    <button onclick="updateStatus('Not Paid')">Mark as Not Paid</button>
+    <button onclick="updateStatus('Used')">Mark as Used</button>
+    <div id="statusDisplay"></div>
+
+    <button onclick="exportData()">Export Data</button>
+    <input type="file" id="importFile" accept=".json" multiple="">
+    <button onclick="importData()">Import Data</button>
+
+    <script>
+        let tickets = {};
+
+        function registerTicket() {
+            const ticketNumber = document.getElementById("ticketNumber").value;
+            const ticketHolder = document.getElementById("ticketHolder").value;
+
+            tickets[ticketNumber] = { name: ticketHolder, status: "Not Paid" };
+            alert(`Ticket ${ticketNumber} for ${ticketHolder} registered.`);
+            clearFields();
+        }
+
+        function updateStatus(newStatus) {
+            const ticketNumber = document.getElementById("ticketNumber").value;
+
+            if (tickets[ticketNumber]) {
+                tickets[ticketNumber].status = newStatus;
+                alert(`Ticket ${ticketNumber} marked as ${newStatus}.`);
+                clearFields();
+            } else {
+                alert(`Ticket ${ticketNumber} not found.`);
+            }
+        }
+
+        function checkStatus() {
+            const ticketNumber = document.getElementById("ticketNumber").value;
+            const statusDisplay = document.getElementById("statusDisplay");
+
+            if (tickets[ticketNumber]) {
+                statusDisplay.textContent = `Ticket ${ticketNumber} for ${tickets[ticketNumber].name} is ${tickets[ticketNumber].status}.`;
+            } else {
+                statusDisplay.textContent = `Ticket ${ticketNumber} not found.`;
+            }
+        }
+
+        function clearFields() {
+            document.getElementById("ticketNumber").value = "";
+            document.getElementById("ticketHolder").value = "";
+        }
+
+        function exportData() {
+            const data = JSON.stringify(tickets);
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "ticket_data.json";
+            a.click();
+        }
+
+        function importData() {
+            const fileInput = document.getElementById("importFile");
+            const files = fileInput.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const importedData = JSON.parse(event.target.result);
+                    Object.assign(tickets, importedData);
+                    alert("Data imported successfully.");
+                };
+                reader.readAsText(files[i]);
+            }
+        }
+    </script>
+
+
+
+<style id="dcoder_stylesheet"></style><script id="dcoder_script"></script></body></html>
